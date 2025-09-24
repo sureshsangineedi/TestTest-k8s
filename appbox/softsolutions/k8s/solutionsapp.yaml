@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: softsolutions-app
-        image:  suresh2dev2/softsolutions:1.0.0
+        image:   ${{ secrets.DOCKER_USERNAME }}/softsolutions:latest
         ports:
         - containerPort: 80
 ---
