@@ -21,8 +21,8 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
-          context: ./docker       # folder containing Dockerfile and index.html
-          file: ./docker/Dockerfile
+          context: ./appbox/softsolutions      # folder containing Dockerfile and index.html
+          file: ./appbox/softsolutions/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/softsolutions:latest
 
