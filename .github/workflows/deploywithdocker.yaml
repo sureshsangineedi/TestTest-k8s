@@ -29,6 +29,6 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f k8s-deployment.yaml
+          kubectl apply -f appbox/softsolutions/k8s/solutionsapp.yaml
           kubectl get pods
           kubectl get svc
