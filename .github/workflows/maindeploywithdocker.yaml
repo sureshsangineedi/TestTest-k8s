@@ -1,0 +1,30 @@
+name: CI/CD Pipeline - SoftSolutions
+
+on:
+  workflow_dispatch:   # manually trigger
+
+jobs:
+  build-deploy:
+    runs-on: self-hosted  # use your self-hosted runner
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          logout: false   # <- this prevents automatic logout
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/softsolutions:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/softsolutions:latest
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s-deployment.yaml
+          kubectl get pods
+          kubectl get svc
