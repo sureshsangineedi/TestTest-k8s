@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: softsolutions-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: softsolutions-app
+  template:
+    metadata:
+      labels:
+        app: softsolutions-app
+    spec:
+      containers:
+      - name: softsolutions-app
+        image:  suresh2dev2/softsolutions:1.0.0
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: softsolutions-service
+spec:
+  selector:
+    app: softsolutions-app
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 80
+    nodePort: 30008
