@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: doctor-app
-        image: suresh2dev2/doctorapp/doctor-app:latest   # replace with your image
+        image: suresh2dev2/doctorapp  # replace with your image
         ports:
         - containerPort: 80
 ---
@@ -31,4 +31,4 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 30202
+    targetPort: 80
