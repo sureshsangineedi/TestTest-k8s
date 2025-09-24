@@ -13,7 +13,7 @@ jobs:
 
       - name: Deploy StudentApp to Kubernetes
         run: |
-          kubectl apply -f appbox/doctorapp/k8s/doctorforyou.yaml
+          kubectl apply -f appbox/mahi-constructions/k8s/mahiapp.yaml
           # kubectl rollout status deployment/student-app
       - name: Validate my deployemnts 
         run: |
