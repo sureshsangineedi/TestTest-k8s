@@ -25,7 +25,7 @@ jobs:
           context: ./appbox/softsolutions      # folder containing Dockerfile and index.html
           file: ./appbox/softsolutions/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/softsolutions:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/softsolutions1:latest
 
       - name: Deploy to Kubernetes
         run: |
