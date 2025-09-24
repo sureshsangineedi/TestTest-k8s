@@ -16,12 +16,15 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          logout: false   # <- this prevents automatic logout
+          logout: false   # prevents automatic logout
 
       - name: Build and Push Docker Image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/softsolutions:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/softsolutions:latest
+        uses: docker/build-push-action@v4
+        with:
+          context: ./docker       # folder containing Dockerfile and index.html
+          file: ./docker/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/softsolutions:latest
 
       - name: Deploy to Kubernetes
         run: |
