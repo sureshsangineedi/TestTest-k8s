@@ -1,6 +1,7 @@
 name: CI/CD Pipeline - SoftSolutions
 
 on:
+
   workflow_dispatch:   # manually trigger
 
 jobs:
