@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: doctor-app
-        image: suresh2dev2/doctorapp  # replace with your image
+        image: suresh2dev2/doctorapp   # replace with your image
         ports:
         - containerPort: 80
 ---
@@ -27,8 +27,9 @@ metadata:
 spec:
   selector:
     app: doctor-app
-  type: NodePort   # Use ClusterIP for minikube
+  type: NodePort   # For external access in most clusters
   ports:
   - protocol: TCP
-    port: 80
-    targetPort: 80
+    port: 8080         # External service port
+    targetPort: 80     # Container port inside the pod
+    nodePort: 30007    # Optional: specify NodePort (30000–32767 range)
