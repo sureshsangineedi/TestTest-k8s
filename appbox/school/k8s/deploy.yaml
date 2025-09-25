@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: school-app
+  labels:
+    app: school-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: school-app
+  template:
+    metadata:
+      labels:
+        app: school-app
+    spec:
+      containers:
+      - name: school-app
+        image: suresh2dev2/school-app:v1   # 👈 image tag v1
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: school-service
+spec:
+  type: NodePort   # Change to LoadBalancer if cloud supports
+  selector:
+    app: school-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30089   # 👈 Different NodePort from Mahi app
