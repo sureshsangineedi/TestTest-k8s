@@ -24,8 +24,9 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
-          context: ./free-ebooks/school        # 👈 folder containing Dockerfile + index.html
+          context: ./appbox/free-ebooks        # 👈 folder containing Dockerfile + index.html
           file: ./appbox/free-ebooks/Dockerfile
+          
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/free-ebooks:v1   # 👈 DockerHub repo + version tag
 
