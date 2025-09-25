@@ -33,4 +33,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30099   # 👈 Different NodePort from Mahi app
+      nodePort: 30132   # 👈 Different NodePort from Mahi app
