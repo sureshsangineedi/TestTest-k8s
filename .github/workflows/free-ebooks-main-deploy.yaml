@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - SoftSolutions-school
+name: CI/CD Pipeline - SoftSolutions-free-ebooks
 
 on:
   workflow_dispatch:   # manually trigger from GitHub Actions tab
