@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: free-ebooks
+  labels:
+    app: free-ebooks
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: free-ebooks
+  template:
+    metadata:
+      labels:
+        app: free-ebooks
+    spec:
+      containers:
+      - name: free-ebooks
+        image: suresh2dev2/free-ebooks:v1   # 👈 image tag v1
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: school-service
+spec:
+  type: NodePort   # Change to LoadBalancer if cloud supports
+  selector:
+    app: free-ebooks
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30099   # 👈 Different NodePort from Mahi app
