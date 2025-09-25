@@ -24,8 +24,8 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
-          context: ./appbox/school-app        # 👈 folder containing Dockerfile + index.html
-          file: ./appbox/school-app/Dockerfile
+          context: ./appbox/school        # 👈 folder containing Dockerfile + index.html
+          file: ./appbox/school/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/school-app:v1   # 👈 DockerHub repo + version tag
 
