@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: free-ebooks
-        image: suresh2dev2/free-ebooks:v1   # 👈 image tag v1
+        image: suresh2dev2/free-ebooks:v2   # 👈 image tag v1
         ports:
         - containerPort: 80
 
