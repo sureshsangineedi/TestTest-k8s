@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: school-app
-        image: suresh2dev2/school-app:v1   # 👈 image tag v1
+        image: suresh2dev2/school-app:v2   # 👈 image tag v1
         ports:
         - containerPort: 80
 
