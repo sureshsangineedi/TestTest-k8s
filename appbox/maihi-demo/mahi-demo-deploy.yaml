@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mahi-app
+  labels:
+    app: mahi-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mahi-app
+  template:
+    metadata:
+      labels:
+        app: mahi-app
+    spec:
+      containers:
+      - name: mahi-app
+        image: suresh2dev2/mahi-app:v1   # 👈 version tag
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mahi-service
+spec:
+  type: NodePort   # You can also use LoadBalancer (if supported)
+  selector:
+    app: mahi-app
+  ports:
+    - protocol: TCP
+      port: 80        # service port
+      targetPort: 80  # container port
+      nodePort: 30017 # external port (accessible on worker node IP)
