@@ -32,7 +32,7 @@ jobs:
       # 4. Deploy to Kubernetes
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f appbox/school/k8s/deploy.yaml
+          kubectl apply -f appbox/free-ebooks/k8s/free-ebooks.yaml
           echo "----- Pods -----"
           kubectl get pods
           echo "----- Services -----"
