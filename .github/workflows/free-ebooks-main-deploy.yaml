@@ -28,7 +28,7 @@ jobs:
           file: ./appbox/free-ebooks/Dockerfile
           
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/free-ebooks:v1   # 👈 DockerHub repo + version tag
+          tags: ${{ secrets.DOCKER_USERNAME }}/free-ebooks:v2   # 👈 DockerHub repo + version tag
 
       # 4. Deploy to Kubernetes
       - name: Deploy to Kubernetes
