@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - SoftSolutions
+name: CI/CD Pipeline - SoftSolutions-mahi
 
 on:
 
@@ -22,13 +22,13 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
-          context: ./appbox/softsolutions      # folder containing Dockerfile and index.html
-          file: ./appbox/softsolutions/Dockerfile
+          context: ./appbox/maihi-demo      # folder containing Dockerfile and index.html
+          file: ./appbox/mahi-demo/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/softsolutions1:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/suresh2dev2/mahi-app:v1
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f appbox/softsolutions/k8s/solutionsapp.yaml
+          kubectl apply -f appbox/maihi-demo
           kubectl get pods
           kubectl get svc
