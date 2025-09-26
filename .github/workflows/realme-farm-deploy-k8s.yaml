@@ -27,7 +27,7 @@ jobs:
           context: ./appbox/realmeapp       # 👈 folder containing Dockerfile + index.html
           file: ./appbox/realmeapp/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/realme-app:v1  # 👈 DockerHub repo + version tag
+          tags: ${{ secrets.DOCKER_USERNAME }}/realme-app:v2  # 👈 DockerHub repo + version tag
 
       # 4. Deploy to Kubernetes
       - name: Deploy to Kubernetes
