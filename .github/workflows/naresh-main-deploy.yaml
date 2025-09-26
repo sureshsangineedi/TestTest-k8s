@@ -17,5 +17,3 @@ jobs:
       run: |
         echo "Applying Kubernetes manifests..."
         kubectl apply -f appbox/nareshapp/k8s/nareshapp.yaml
-
-
