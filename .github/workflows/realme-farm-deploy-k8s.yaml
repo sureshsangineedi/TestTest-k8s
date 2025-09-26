@@ -1,4 +1,4 @@
-name: mango-farm ci/cd info
+name: realme-farm ci/cd info
 
 on:
   workflow_dispatch:   # manually trigger from GitHub Actions tab
