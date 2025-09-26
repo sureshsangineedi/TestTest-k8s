@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mango-farm
+  labels:
+    app: mango-farm
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mango-farm
+  template:
+    metadata:
+      labels:
+        app: mango-farm
+    spec:
+      containers:
+      - name: mango-farm
+        image: suresh2dev2/mango-farm:latest   # 👈 replace with your image
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mango-farm-service
+spec:
+  selector:
+    app: mango-farm
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
