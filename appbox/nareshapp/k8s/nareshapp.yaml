@@ -31,5 +31,5 @@ spec:
     - protocol: TCP
       port: 80        # Service port
       targetPort: 80  # Container port
-      nodePort: 30281 # Fixed NodePort
+      nodePort: 31281 # Fixed NodePort
   type: NodePort
