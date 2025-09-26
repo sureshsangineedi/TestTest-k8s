@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: nareshapp
-        image: suresh2dev2/nareshapp:v1 
+        image: suresh2dev2/nareshapp:v1
         ports:
         - containerPort: 80
 ---
