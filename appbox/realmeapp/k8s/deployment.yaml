@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: realme-app
-        image: suresh2dev2/realme-app:v1
+        image: suresh2dev2/realme-app:v2
         ports:
         - containerPort: 80
 ---
