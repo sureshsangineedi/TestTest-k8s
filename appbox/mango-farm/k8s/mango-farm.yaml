@@ -27,7 +27,8 @@ metadata:
 spec:
   selector:
     app: mango-farm
-  ports:
-    - port: 80
+ ports:
+    - protocol: TCP
+      port: 80
       targetPort: 80
-  type: ClusterIP
+      nodePort: 30133 
