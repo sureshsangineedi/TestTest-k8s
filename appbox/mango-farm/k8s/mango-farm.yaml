@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: mango-farm
-        image: suresh2dev2/mango-farm:latest   # 👈 replace with your image
+        image: suresh2dev2/mango-farm:v1   # 👈 replace with your image
         ports:
         - containerPort: 80
 ---
