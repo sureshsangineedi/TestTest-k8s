@@ -1,4 +1,4 @@
-name: Deploy Naresh App 
+name: Deploy Naresh App
 
 on:
   push:
@@ -7,18 +7,15 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: self-hosted   # using your self-hosted runner
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'latest'
-
     - name: Deploy to Kubernetes
-      # Add your kubeconfig as a secret
       run: |
+        echo "Applying Kubernetes manifests..."
         kubectl apply -f appbox/nareshapp/k8s/nareshapp.yaml
+
+
