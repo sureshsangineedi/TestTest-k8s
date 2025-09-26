@@ -27,7 +27,7 @@ jobs:
           context: ./appbox/mango-farm        # 👈 folder containing Dockerfile + index.html
           file: ./appbox/mango-farm/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/mango-farm:v1   # 👈 DockerHub repo + version tag
+          tags: ${{ secrets.DOCKER_USERNAME }}/mango-farm:v2   # 👈 DockerHub repo + version tag
 
       # 4. Deploy to Kubernetes
       - name: Deploy to Kubernetes
