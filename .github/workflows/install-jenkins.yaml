@@ -7,35 +7,32 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted  # use your self-hosted runner
+    runs-on: self-hosted  # your Windows self-hosted runner
 
     steps:
-      # Step 1: Checkout code
+      # Step 1: Checkout repo
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Configure Kubeconfig
-      - name: Set Kubeconfig
-        run: |
-          # Ensure your kubeconfig path is correct
-          echo "Using existing kubeconfig file"
-          export KUBECONFIG=$HOME/.kube/config
-          kubectl config view
+
 
       # Step 3: Add Jenkins Helm repo
       - name: Add Jenkins Helm repo
+        shell: pwsh
         run: |
-          "C:\Program Files\helm\helm.exe" repo add jenkinsci https://charts.jenkins.io
+          & "C:\Program Files\helm\helm.exe" repo add jenkinsci https://charts.jenkins.io
 
       # Step 4: Update Helm repos
       - name: Update Helm repos
+        shell: pwsh
         run: |
-          "C:\Program Files\helm\helm.exe" repo update
+          & "C:\Program Files\helm\helm.exe" repo update
 
-      # Step 5: Deploy/Upgrade Jenkins with updated values
+      # Step 5: Deploy/Upgrade Jenkins
       - name: Deploy Jenkins
+        shell: pwsh
         run: |
-          "C:\Program Files\helm\helm.exe" upgrade --install jenkins jenkinsci/jenkins `
+          & "C:\Program Files\helm\helm.exe" upgrade --install jenkins jenkinsci/jenkins `
             --namespace jenkins `
             --create-namespace `
             --set controller.serviceType=NodePort `
