@@ -8,31 +8,40 @@ on:
 
 jobs:
   install-jenkins:
-    runs-on: self-hosted   # Windows node with Git Bash
+    runs-on: self-hosted   # Windows node
     defaults:
       run:
-         shell: "C:\\Program Files\\Git\\bin\\bash.exe {0}"   # ✅ force all steps to run in Bash
+        shell: pwsh  # Force PowerShell for all steps
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Add Jenkins Helm repo
+        run: |
+          helm repo add jenkinsci https://charts.jenkins.io
+          helm repo update
+
       - name: Create namespace for Jenkins
         run: |
-          kubectl create namespace jenkins || echo "Namespace already exists"
+          try {
+              kubectl create namespace jenkins
+          } catch {
+              Write-Host "Namespace already exists"
+          }
 
       - name: Install Jenkins via Helm
         run: |
-          helm upgrade --install jenkins jenkinsci/jenkins /
-            --namespace jenkins /
-            --set controller.serviceType=NodePort /
-            --set controller.nodePort=30090 /
-            --set persistence.enabled=true /
-            --set persistence.size=200Mi /
-            --set controller.resources.requests.cpu=200m /
-            --set controller.resources.requests.memory=300Mi /
-            --set controller.resources.limits.cpu=300m /
-            --set controller.resources.limits.memory=400mi
+          helm upgrade --install jenkins jenkinsci/jenkins `
+            --namespace jenkins `
+            --set controller.serviceType=NodePort `
+            --set controller.nodePort=30090 `
+            --set persistence.enabled=true `
+            --set persistence.size=200Mi `
+            --set controller.resources.requests.cpu=200m `
+            --set controller.resources.requests.memory=300Mi `
+            --set controller.resources.limits.cpu=300m `
+            --set controller.resources.limits.memory=400Mi
 
       - name: Wait for Jenkins Pod to be Ready
         run: |
@@ -40,11 +49,12 @@ jobs:
 
       - name: Get Jenkins Admin Password
         run: |
-          echo "Admin password:"
-          kubectl get secret --namespace jenkins jenkins \
+          Write-Host "Admin password:"
+          $password = kubectl get secret --namespace jenkins jenkins `
             -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode
-          echo
+          Write-Host $password
 
       - name: Print Jenkins URL
         run: |
-          echo "Jenkins URL: http://$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}'):30090"
+          $nodeIP = kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}'
+          Write-Host "Jenkins URL: http://$nodeIP:30090"
