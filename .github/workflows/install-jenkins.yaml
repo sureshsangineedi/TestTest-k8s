@@ -1,0 +1,46 @@
+name: Install Jenkins with Helm
+
+on:
+  workflow_dispatch:   # run manually
+  push:
+    branches:
+      - main
+
+jobs:
+  install-jenkins:
+    runs-on: self-hosted   # or ubuntu-latest if you configure cluster access there
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Add Jenkins Helm repo
+        run: |
+          helm repo add jenkinsci https://charts.jenkins.io
+          helm repo update
+
+      - name: Create namespace for Jenkins
+        run: |
+          kubectl create namespace jenkins || echo "Namespace already exists"
+
+      - name: Install Jenkins via Helm
+        run: |
+          helm upgrade --install jenkins jenkinsci/jenkins \
+            --namespace jenkins \
+            --set controller.serviceType=NodePort \
+            --set controller.nodePort=30090 \
+            --set persistence.enabled=true \
+            --set persistence.size=200Mi
+
+      - name: Wait for Jenkins Pod to be Ready
+        run: |
+          kubectl rollout status deployment/jenkins --namespace=jenkins --timeout=300s
+
+      - name: Get Jenkins Admin Password
+        run: |
+          echo "Admin password:"
+          kubectl exec --namespace jenkins -it svc/jenkins -c jenkins -- cat /run/secrets/additional/chart-admin-password
