@@ -19,11 +19,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-
-      - name: Create namespace for Jenkins
-        run: |
-          kubectl create namespace jenkins || echo "Namespace already exists"
-
       - name: Install Jenkins via Helm
         run: |
           helm upgrade --install jenkins jenkinsci/jenkins \
