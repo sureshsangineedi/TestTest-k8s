@@ -19,10 +19,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Add Jenkins Helm repo
-        run: |
-          helm repo add jenkinsci https://charts.jenkins.io
-          helm repo update
 
       - name: Create namespace for Jenkins
         run: |
@@ -31,11 +27,15 @@ jobs:
       - name: Install Jenkins via Helm
         run: |
           helm upgrade --install jenkins jenkinsci/jenkins \
-            --namespace jenkins \
-            --set controller.serviceType=NodePort \
-            --set controller.nodePort=30090 \
-            --set persistence.enabled=true \
-            --set persistence.size=200Mi
+           --namespace jenkins \
+           --set controller.serviceType=NodePort \
+           --set controller.nodePort=30090 \
+           --set persistence.enabled=true \
+           --set persistence.size=1Gi \
+           --set controller.resources.requests.cpu=200m \
+           --set controller.resources.requests.memory=254Mi \
+           --set controller.resources.limits.cpu=300m \
+           --set controller.resources.limits.memory=300mi
 
       - name: Wait for Jenkins Pod to be Ready
         run: |
