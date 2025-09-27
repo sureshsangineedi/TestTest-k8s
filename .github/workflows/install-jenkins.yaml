@@ -1,3 +1,4 @@
+
 name: Install Jenkins with Helm
 
 on:
@@ -8,14 +9,11 @@ on:
 
 defaults:
   run:
-    shell: bash
+    shell: "C:\\Program Files\\Git\\bin\\bash.exe"  # ✅ force Git Bash on Windows runner
 
 jobs:
   install-jenkins:
-    runs-on: self-hosted   # or ubuntu-latest if you configure cluster access there
-    defaults:
-      run:
-        shell: bash        # ✅ force bash for all steps
+    runs-on: self-hosted   # or ubuntu-latest if cluster access configured
 
     steps:
       - name: Checkout code
