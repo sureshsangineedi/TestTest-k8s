@@ -23,7 +23,7 @@ jobs:
        
       - name: Build & Push App1
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/app10:latest ./app10
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/app10:latest ./appbox/for-mahesh
           docker push ${{ secrets.DOCKER_USERNAME }}/app10:latest
 
      
