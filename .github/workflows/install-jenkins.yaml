@@ -35,7 +35,7 @@ jobs:
           helm upgrade --install jenkins jenkinsci/jenkins `
             --namespace jenkins `
             --set controller.serviceType=NodePort `
-            --set controller.nodePort=30090 `
+            --set controller.nodePort=30090 ` 
             --set persistence.enabled=true `
             --set persistence.size=200Mi `
             --set controller.resources.requests.cpu=200m `
