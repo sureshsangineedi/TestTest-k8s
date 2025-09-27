@@ -1,19 +1,19 @@
-name: Deploy Naresh App
+# name: Deploy Naresh App
 
-on:
-  push:
-    branches:
-      - main  # triggers on push to main branch
+# on:
+#   push:
+#     branches:
+#       - main  # triggers on push to main branch
 
-jobs:
-  deploy:
-    runs-on: self-hosted   # using your self-hosted runner
+# jobs:
+#   deploy:
+#     runs-on: self-hosted   # using your self-hosted runner
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
 
-    - name: Deploy to Kubernetes
-      run: |
-        echo "Applying Kubernetes manifests..."
-        kubectl apply -f appbox/nareshapp/k8s/nareshapp.yaml
+#     - name: Deploy to Kubernetes
+#       run: |
+#         echo "Applying Kubernetes manifests..."
+#         kubectl apply -f appbox/nareshapp/k8s/nareshapp.yaml
