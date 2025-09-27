@@ -17,11 +17,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Add Jenkins Helm repo
-        run: |
-          helm repo add jenkinsci https://charts.jenkins.io
-          helm repo update
-
       - name: Create namespace for Jenkins
         run: |
           kubectl create namespace jenkins || echo "Namespace already exists"
