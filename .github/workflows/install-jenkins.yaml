@@ -23,15 +23,15 @@ jobs:
 
       - name: Install Jenkins via Helm
         run: |
-          helm upgrade --install jenkins jenkinsci/jenkins \
-            --namespace jenkins \
-            --set controller.serviceType=NodePort \
-            --set controller.nodePort=30090 \
-            --set persistence.enabled=true \
-            --set persistence.size=200Mi \
-            --set controller.resources.requests.cpu=200m \
-            --set controller.resources.requests.memory=300Mi \
-            --set controller.resources.limits.cpu=300m \
+          helm upgrade --install jenkins jenkinsci/jenkins /
+            --namespace jenkins /
+            --set controller.serviceType=NodePort /
+            --set controller.nodePort=30090 /
+            --set persistence.enabled=true /
+            --set persistence.size=200Mi /
+            --set controller.resources.requests.cpu=200m /
+            --set controller.resources.requests.memory=300Mi /
+            --set controller.resources.limits.cpu=300m /
             --set controller.resources.limits.memory=400mi
 
       - name: Wait for Jenkins Pod to be Ready
