@@ -43,4 +43,6 @@ jobs:
       - name: Get Jenkins Admin Password
         run: |
           echo "Admin password:"
-          kubectl exec --namespace jenkins -it svc/jenkins -c jenkins -- cat /run/secrets/additional/chart-admin-password
+          kubectl get secret --namespace jenkins jenkins \
+            -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode
+          echo
