@@ -24,16 +24,16 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
-          context: ./appbox/orangeapp         # 👈 folder with Dockerfile + index.html
-          file: ./appbox/orangeapp/Dockerfile
+          context: ./appbox/oragneapp         # 👈 folder with Dockerfile + index.html
+          file: ./appbox/oragneapp/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/orangeapp:latest
 
       # 4. Deploy to Kubernetes
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f appbox/orangeapp/k8s/deployment.yaml
+          kubectl apply -f appbox/oragneapp/k8s/deployment.yaml
           echo "----- Pods -----"
-          kubectl get pods -l app=orangeapp
+          kubectl get pods -l app=oragneapp
           echo "----- Services -----"
-          kubectl get svc -l app=orangeapp
+          kubectl get svc -l app=oragneapp
