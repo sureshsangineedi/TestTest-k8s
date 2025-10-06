@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OrangeFarm — Farmers Market</title>
+  <style>
+    body { font-family: Inter, system-ui, Arial; margin:0; padding:0; background:#fff7f0; color:#333; }
+    header { background:#ff8c42; color:white; padding:20px 16px; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.08);}
+    .container { max-width:900px; margin:20px auto; padding:0 16px; }
+    .card { background:white; border-radius:8px; padding:14px; box-shadow:0 1px 4px rgba(0,0,0,0.06); margin-bottom:12px;}
+    .product-list { display:grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+    .product { border:1px dashed #ffb57a; padding:12px; border-radius:8px; background:linear-gradient(180deg,#fff,#fff7f0); }
+    .product h4{ margin:0 0 6px 0; }
+    label{ display:block; font-size:13px; margin-top:8px;}
+    input, select, textarea { width:100%; padding:8px; font-size:14px; box-sizing:border-box; margin-top:4px; border-radius:6px; border:1px solid #e6c7a6;}
+    button { background:#ff8c42; color:white; border:none; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:600; }
+    footer { text-align:center; color:#8a6b56; padding:20px; font-size:13px; }
+    .row { display:flex; gap:8px; margin-top:8px; }
+    .muted { color:#7b6b5e; font-size:13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🍊 OrangeFarm</h1>
+    <div class="muted">Farmers sell directly — no middleman</div>
+  </header>
+
+  <div class="container">
+    <div class="card" id="sellCard">
+      <h3>List your product</h3>
+      <label>Farmer name
+        <input id="farmer" placeholder="Ex: Ramesh" />
+      </label>
+      <label>Product name
+        <input id="name" placeholder="Ex: Mangoes (10 kg)" />
+      </label>
+      <label>Category
+        <select id="category">
+          <option>Fruits</option>
+          <option>Vegetables</option>
+          <option>Others</option>
+        </select>
+      </label>
+      <label>Price (₹ / unit)
+        <input id="price" type="number" placeholder="100" />
+      </label>
+      <label>Description
+        <textarea id="desc" rows="2" placeholder="Short note for buyers"></textarea>
+      </label>
+      <div class="row">
+        <button onclick="addProduct()">Add product</button>
+        <button onclick="clearForm()" style="background:#f0a86b">Reset</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Available products</h3>
+      <div id="list" class="product-list">
+        <!-- dynamic -->
+      </div>
+      <div id="empty" class="muted" style="margin-top:8px">No products yet — add one above.</div>
+    </div>
+
+    <div class="card">
+      <h3>How it works</h3>
+      <ul>
+        <li>Farmers fill the form and add products.</li>
+        <li>Buyers can see the listing and contact the farmer directly (contact details not included in this demo).</li>
+        <li>Next steps: add backend, authentication, payment and messaging.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>OrangeFarm • Made for small farmers • Demo static app</footer>
+
+  <script>
+    const listEl = document.getElementById('list');
+    const emptyEl = document.getElementById('empty');
+
+    function render() {
+      listEl.innerHTML = '';
+      const items = JSON.parse(localStorage.getItem('orange_products') || '[]');
+      if (!items.length) {
+        emptyEl.style.display = 'block';
+      } else {
+        emptyEl.style.display = 'none';
+      }
+      items.forEach((p, i) => {
+        const d = document.createElement('div');
+        d.className = 'product';
+        d.innerHTML = `
+          <h4>${escapeHtml(p.name)}</h4>
+          <div class="muted">Farmer: ${escapeHtml(p.farmer)} • ${escapeHtml(p.category)}</div>
+          <p style="margin:8px 0"><strong>₹ ${escapeHtml(p.price)}</strong></p>
+          <div style="font-size:13px; color:#6b5848">${escapeHtml(p.desc)}</div>
+          <div style="margin-top:8px; display:flex; gap:6px;">
+            <button onclick="contact(${i})" style="background:#ffb57a; color:#4a2a10">Contact</button>
+            <button onclick="removeProduct(${i})" style="background:#eee; color:#8a6b56">Remove</button>
+          </div>
+        `;
+        listEl.appendChild(d);
+      });
+    }
+
+    function addProduct() {
+      const p = {
+        farmer: document.getElementById('farmer').value.trim(),
+        name: document.getElementById('name').value.trim(),
+        category: document.getElementById('category').value,
+        price: document.getElementById('price').value,
+        desc: document.getElementById('desc').value.trim()
+      };
+      if (!p.farmer || !p.name || !p.price) {
+        alert('Please add farmer name, product name and price.');
+        return;
+      }
+      const items = JSON.parse(localStorage.getItem('orange_products') || '[]');
+      items.unshift(p);
+      localStorage.setItem('orange_products', JSON.stringify(items));
+      clearForm();
+      render();
+    }
+
+    function removeProduct(i) {
+      const items = JSON.parse(localStorage.getItem('orange_products') || '[]');
+      if (confirm('Remove this product?')) {
+        items.splice(i,1);
+        localStorage.setItem('orange_products', JSON.stringify(items));
+        render();
+      }
+    }
+
+    function contact(i) {
+      const items = JSON.parse(localStorage.getItem('orange_products') || '[]');
+      const p = items[i];
+      alert('Contact farmer: ' + p.farmer + '\\nTell them you saw their product on OrangeFarm.');
+    }
+
+    function clearForm() {
+      document.getElementById('farmer').value='';
+      document.getElementById('name').value='';
+      document.getElementById('price').value='';
+      document.getElementById('desc').value='';
+      document.getElementById('category').selectedIndex = 0;
+    }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+
+    // initial demo data (only if empty)
+    if(!localStorage.getItem('orange_products')) {
+      localStorage.setItem('orange_products', JSON.stringify([
+        { farmer:'Radha', name:'Alphonso Mangoes (5 kg)', category:'Fruits', price:'1200', desc:'Sweet, tree-ripened.'},
+        { farmer:'Mohan', name:'Tomatoes (10 kg)', category:'Vegetables', price:'350', desc:'Fresh from the field.'}
+      ]));
+    }
+    render();
+  </script>
+</body>
+</html>
