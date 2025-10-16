@@ -23,10 +23,11 @@ kind: Service
 metadata:
   name: frontend-service
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: frontend
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
+      nodePort: 30080   # 👈 you can change this to any free port between 30000–32767
