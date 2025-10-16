@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fullstack App</title>
+</head>
+<body>
+    <h1>Fullstack App</h1>
+    <div id="message">Loading...</div>
+
+    <script>
+        fetch('http://backend-service:5000/api/message')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('message').innerText = data.message;
+            });
+    </script>
+</body>
+</html>
