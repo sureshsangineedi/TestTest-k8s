@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: <DOCKER_USERNAME>/backend:latest
+          image: suresh2dev2/backend:latest
           ports:
             - containerPort: 5000
 ---
