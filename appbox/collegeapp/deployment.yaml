@@ -9,7 +9,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: college
+      app: college 
   template:
     metadata:
       labels:
