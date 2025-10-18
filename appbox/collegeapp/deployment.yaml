@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: college-website
-labels:
-app: college
+  name: college-website
+  labels:
+    app: college
 spec:
-replicas: 1
-selector:
-matchLabels:
-app: college
-template:
-metadata:
-labels:
-app: college
-spec:
-containers:
-- name: nginx
-image: nginx:1.25-alpine
-ports:
-- containerPort: 80
-volumeMounts:
-- name: site-content
-mountPath: /usr/share/nginx/html/index.html
-subPath: index.html
-volumes:
-- name: site-content
-configMap:
-name: college-index
-items:
-- key: index.html
-path: index.html
+  replicas: 1
+  selector:
+    matchLabels:
+      app: college
+  template:
+    metadata:
+      labels:
+        app: college
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25-alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: site-content
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
+      volumes:
+        - name: site-content
+          configMap:
+            name: college-index
+            items:
+              - key: index.html
+                path: index.html
