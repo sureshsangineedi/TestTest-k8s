@@ -20,14 +20,4 @@ spec:
           image: nginx:1.25-alpine
           ports:
             - containerPort: 80
-          volumeMounts:
-            - name: site-content
-              mountPath: /usr/share/nginx/html/index.html
-              subPath: index.html
-      volumes:
-        - name: site-content
-          configMap:
-            name: college-index
-            items:
-              - key: index.html
-                path: index.html
+  
