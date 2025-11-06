@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Electric Bulb — Front Page</title>
+  <style>
+    :root{
+      --bg:#0f1724; /* deep night */
+      --card:#0b1220;
+      --accent:#ffd66b; /* warm bulb color */
+      --accent-dim:#ffecb3;
+      --muted:#98a0b3;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: linear-gradient(180deg,var(--bg) 0%, #07101a 60%);
+      color:#e6eef8;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:32px;
+    }
+
+    .panel{
+      width:100%;
+      max-width:920px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:16px;
+      padding:40px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:32px;
+      align-items:center;
+    }
+
+    h1{margin:0 0 8px 0;font-size:28px}
+    p.lead{margin:0;color:var(--muted)}
+
+    .bulb-wrap{
+      display:flex;flex-direction:column;align-items:center;gap:18px;
+    }
+
+    .bulb-card{
+      background: radial-gradient(closest-side, rgba(255,255,255,0.03), transparent 60%);
+      padding:28px;border-radius:14px;display:flex;align-items:center;justify-content:center;position:relative;
+      width:100%;height:320px;
+    }
+
+    .bulb{
+      width:160px;height:260px;cursor:pointer;outline:none;border:none;background:transparent;display:block;
+      transition:filter .25s ease, transform .25s ease;
+    }
+
+    .bulb:active{transform:scale(.98)}
+
+    /* glow when ON */
+    .glow{
+      position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:0;transition:opacity .35s ease;
+      background: radial-gradient(ellipse at center, rgba(255,220,120,0.32) 0%, rgba(255,200,80,0.12) 30%, transparent 60%);
+      border-radius:inherit;
+    }
+
+    .on .glow{opacity:1}
+
+    /* info column */
+    .info{padding:14px}
+
+    .controls{display:flex;gap:12px;align-items:center;margin-top:16px}
+
+    .btn{appearance:none;border:0;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,0.03);color:inherit;cursor:pointer}
+
+    /* stylish toggle */
+    .switch{display:inline-grid;grid-auto-flow:column;gap:8px;align-items:center}
+    .toggle{--w:56px;--h:30px;width:var(--w);height:var(--h);border-radius:999px;background:rgba(255,255,255,0.06);display:inline-grid;align-items:center;padding:4px;cursor:pointer}
+    .knob{width:22px;height:22px;border-radius:50%;background:white;transform:translateX(0);transition:transform .25s cubic-bezier(.2,.9,.2,1)}
+    .on .toggle{background:linear-gradient(90deg,var(--accent), #ffb84d)}
+    .on .knob{transform:translateX(calc(var(--w) - var(--h)));background:var(--card)}
+
+    footer{grid-column:1/-1;margin-top:18px;color:var(--muted);font-size:13px}
+
+    /* responsive */
+    @media (max-width:880px){
+      .panel{grid-template-columns:1fr;gap:18px;padding:24px}
+      .bulb-card{height:280px}
+    }
+
+    /* small decorative floor */
+    .floor{width:80%;height:8px;border-radius:99px;background:linear-gradient(90deg,rgba(0,0,0,0.6), rgba(255,255,255,0.02));opacity:.4;margin-top:12px}
+
+    /* accessibility focus */
+    .bulb:focus-visible{box-shadow:0 0 0 4px rgba(255,214,102,0.14);border-radius:12px}
+  </style>
+</head>
+<body>
+  <main class="panel" id="page">
+    <section>
+      <h1>Electric Bulb</h1>
+      <p class="lead">A small interactive front page showcasing an electric bulb. Click the bulb or use the toggle to turn it on and off — good for demos, portfolio headers, or hero sections.</p>
+
+      <div class="controls" style="margin-top:24px">
+        <div class="switch" aria-hidden>
+          <div id="toggleGroup" class="toggle" tabindex="0" role="switch" aria-checked="false" aria-label="Turn bulb on or off">
+            <div class="knob"></div>
+          </div>
+        </div>
+
+        <button id="btnToggle" class="btn">Toggle</button>
+        <button id="btnPulse" class="btn">Pulse</button>
+      </div>
+
+      <div style="margin-top:22px;color:var(--muted)">
+        <strong>Tip:</strong> Press <kbd>Space</kbd> or <kbd>Enter</kbd> while focusing the switch to toggle.
+      </div>
+
+      <footer>Made with HTML/CSS/JS — click the bulb to toggle the light.</footer>
+    </section>
+
+    <aside class="bulb-wrap">
+      <div id="bulbCard" class="bulb-card" aria-hidden="false">
+        <div class="glow" id="glow"></div>
+
+        <!-- SVG bulb: simple, scalable -->
+        <button id="bulbBtn" class="bulb" aria-pressed="false" title="Toggle bulb" aria-label="Toggle bulb">
+          <svg viewBox="0 0 120 200" xmlns="http://www.w3.org/2000/svg" width="160" height="260" role="img">
+            <defs>
+              <linearGradient id="glassGrad" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+                <stop offset="45%" stop-color="#ffffff" stop-opacity="0.2" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0.06" />
+              </linearGradient>
+              <radialGradient id="filamentGlow" cx="50%" cy="40%" r="40%">
+                <stop offset="0%" stop-color="var(--accent)" stop-opacity="1" />
+                <stop offset="100%" stop-color="#ffb84d" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+
+            <!-- bulb glass -->
+            <g id="bulbGroup" transform="translate(10,4)">
+              <ellipse cx="50" cy="60" rx="44" ry="58" fill="url(#glassGrad)" stroke="rgba(255,255,255,0.06)" stroke-width="2" />
+
+              <!-- filament + glow (will be visible when on) -->
+              <g id="filament" transform="translate(50,56)" opacity="0">
+                <ellipse cx="0" cy="-6" rx="26" ry="14" fill="url(#filamentGlow)" />
+                <path d="M-14 6 C -10 -2, 10 -2, 14 6" stroke="#7a2" stroke-width="2" fill="none" stroke-linecap="round" />
+                <rect x="-10" y="6" width="20" height="18" rx="2" fill="#b48" opacity="0.9"/>
+              </g>
+
+              <!-- base of bulb -->
+              <rect x="28" y="118" width="44" height="34" rx="4" fill="#2b2f36" />
+              <rect x="36" y="126" width="28" height="4" rx="2" fill="#121417" />
+              <rect x="36" y="134" width="28" height="4" rx="2" fill="#0c0d0f" />
+
+              <!-- metallic screw -->
+              <g transform="translate(35,118)">
+                <rect x="0" y="0" width="50" height="18" rx="3" fill="#d9d9d9" opacity="0.06"/>
+                <path d="M0 4 h50 M0 10 h50" stroke="rgba(0,0,0,0.2)" stroke-width="2"/>
+              </g>
+            </g>
+          </svg>
+        </button>
+
+      </div>
+
+      <div style="text-align:center">
+        <div style="font-weight:600">Status</div>
+        <div id="status" style="color:var(--muted);margin-top:6px">Off</div>
+        <div class="floor" aria-hidden="true"></div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const page = document.getElementById('page');
+    const bulbBtn = document.getElementById('bulbBtn');
+    const filament = document.getElementById('filament');
+    const glow = document.getElementById('glow');
+    const bulbCard = document.getElementById('bulbCard');
+    const toggle = document.getElementById('toggleGroup');
+    const btnToggle = document.getElementById('btnToggle');
+    const btnPulse = document.getElementById('btnPulse');
+    const status = document.getElementById('status');
+
+    let isOn = false;
+    let pulseTimer = null;
+
+    function render(){
+      if(isOn){
+        bulbCard.classList.add('on');
+        filament.style.transition = 'opacity .25s ease, transform .35s ease';
+        filament.style.opacity = '1';
+        filament.style.transform = 'translateY(-2px)';
+        toggle.setAttribute('aria-checked','true');
+        bulbBtn.setAttribute('aria-pressed','true');
+        toggle.classList.add('on');
+        status.textContent = 'On';
+      } else {
+        bulbCard.classList.remove('on');
+        filament.style.opacity = '0';
+        filament.style.transform = 'translateY(0)';
+        toggle.setAttribute('aria-checked','false');
+        bulbBtn.setAttribute('aria-pressed','false');
+        toggle.classList.remove('on');
+        status.textContent = 'Off';
+      }
+    }
+
+    function toggleBulb(){
+      isOn = !isOn; render();
+    }
+
+    bulbBtn.addEventListener('click', toggleBulb);
+    toggle.addEventListener('click', toggleBulb);
+    btnToggle.addEventListener('click', toggleBulb);
+
+    toggle.addEventListener('keydown', (e)=>{
+      if(e.code === 'Space' || e.code === 'Enter'){
+        e.preventDefault(); toggleBulb();
+      }
+    });
+
+    btnPulse.addEventListener('click', ()=>{
+      // short pulse animation: flicker a couple times
+      if(pulseTimer) clearTimeout(pulseTimer);
+      const seq = [true,false,true,false,true];
+      let i=0;
+      const step = ()=>{
+        isOn = seq[i]; render(); i++; if(i<seq.length) pulseTimer = setTimeout(step, 160); else pulseTimer = setTimeout(()=>{isOn=false;render()},400);
+      };
+      step();
+    });
+
+    // initialize
+    render();
+  </script>
+</body>
+</html>
