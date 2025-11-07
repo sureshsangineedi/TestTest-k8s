@@ -1,4 +1,4 @@
-name: Docker Build (Local + Push to Docker Hub) for gym
+name: Docker Build push and k8s deploying  for gym-app on k8s
 
 on:
   workflow_dispatch: # Allows manual trigger from GitHub UI
