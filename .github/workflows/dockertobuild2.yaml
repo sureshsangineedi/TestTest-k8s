@@ -14,7 +14,7 @@ jobs:
     # Environment variables for image naming
     env:
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_USERNAME }} # Should be 'rajuprudhvi'
-      IMAGE_NAME: ele-app
+      IMAGE_NAME: random-quotes
       DOCKER_TAG: ${{ github.sha }} # Unique tag based on commit hash
 
     steps:
@@ -32,7 +32,7 @@ jobs:
       - name: 🔨 Build and Tag Docker Image
         run: |
           docker build `
-            --file appbox/ele-app/Dockerfile `
+            --file appbox/randomquotes/Dockerfile `
             . `
             --tag ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
           
