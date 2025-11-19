@@ -1,4 +1,4 @@
-name: Docker Build (Local + Push to Docker Hub) for redis-k8s-app
+name: radis-suresh
 
 on:
   workflow_dispatch: # Allows manual trigger from GitHub UI
