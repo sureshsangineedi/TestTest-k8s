@@ -1,0 +1,13 @@
+{
+  "name": "redis-k8s-app",
+  "version": "1.0.0",
+  "description": "Simple Node.js + Redis app",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "redis": "^4.6.7"
+  }
+}

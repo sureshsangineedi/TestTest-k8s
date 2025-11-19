@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redis Data Storage App</title>
+</head>
+<body>
+    <h1>Redis Data Storage App</h1>
+    
+    <form id="dataForm">
+        <input type="text" id="key" placeholder="Enter key" required>
+        <input type="text" id="value" placeholder="Enter value" required>
+        <button type="submit">Save Data</button>
+    </form>
+
+    <form id="getForm">
+        <input type="text" id="getKey" placeholder="Enter key to fetch" required>
+        <button type="submit">Get Data</button>
+    </form>
+
+    <h2>Result:</h2>
+    <div id="result"></div>
+
+    <script>
+        const form = document.getElementById('dataForm');
+        const getForm = document.getElementById('getForm');
+        const result = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const key = document.getElementById('key').value;
+            const value = document.getElementById('value').value;
+            const res = await fetch(`/set?key=${key}&value=${value}`);
+            const data = await res.text();
+            result.innerText = data;
+        });
+
+        getForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const key = document.getElementById('getKey').value;
+            const res = await fetch(`/get?key=${key}`);
+            const data = await res.text();
+            result.innerText = data;
+        });
+    </script>
+</body>
+</html>
