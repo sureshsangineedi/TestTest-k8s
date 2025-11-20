@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: idea
+  template:
+    metadata:
+      labels:
+        app: idea
+    spec:
+      containers:
+        - name: idea
+          image: suresh2dev2/idea:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: REDIS_HOST
+              value: "redis-service"
+            - name: REDIS_PORT
+              value: "6379"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: idea-service
+spec:
+  selector:
+    app: idea
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: NodePort
+

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Idea Redis Counter</title>
+</head>
+<body>
+  <h1>Idea Redis Counter</h1>
+  <p>Count: <span id="count">0</span></p>
+  <button onclick="increment()">Increment</button>
+
+  <script>
+    async function fetchCount() {
+      const res = await fetch('/count');
+      const data = await res.json();
+      document.getElementById('count').innerText = data.count;
+    }
+
+    async function increment() {
+      const res = await fetch('/increment', { method: 'POST' });
+      const data = await res.json();
+      document.getElementById('count').innerText = data.count;
+    }
+
+    fetchCount();
+    setInterval(fetchCount, 5000);
+  </script>
+</body>
+</html>
