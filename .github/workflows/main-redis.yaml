@@ -32,5 +32,5 @@ jobs:
 
       - name: Apply Kubernetes manifests
         run: |
-          kubectl apply -f appbox/idea/Dockerfile
+          kubectl apply -f appbox/idea/deployment.yaml
           
