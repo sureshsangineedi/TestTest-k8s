@@ -20,8 +20,8 @@ jobs:
         run: |
           echo "Building local Docker image..."
           docker build `
-            --file appbox/redis/Dockerfile `
-            appbox/redis `
+            --file appbox/radis-app/Dockerfile `
+            appbox/radis-app `
             --tag ${{ env.IMAGE_NAME }}:local `
             --tag ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} `
             --tag ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
