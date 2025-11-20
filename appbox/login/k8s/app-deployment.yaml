@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-demo-app
+  template:
+    metadata:
+      labels:
+        app: redis-demo-app
+    spec:
+      containers:
+        - name: app
+          image: YOUR_DOCKERHUB_USERNAME/redis-demo-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: REDIS_HOST
+              value: "redis-service"
+            - name: REDIS_PORT
+              value: "6379"
