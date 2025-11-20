@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: redis-app
-        image: yourdocker/redis-app:latest
+        image: suresh2dev2/redis-app:latest
         env:
         - name: REDIS_HOST
           value: "redis"
