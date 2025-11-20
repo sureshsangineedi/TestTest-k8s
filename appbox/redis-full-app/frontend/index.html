@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>Simple Redis App</title></head>
+<body>
+<h2>Store Data</h2>
+<form onsubmit="saveData(event)">
+  <input id="name" placeholder="Enter name" required />
+  <input id="email" placeholder="Enter email" required />
+  <button type="submit">Save</button>
+</form>
+
+<h2>Get Data</h2>
+<button onclick="getData()">Load Data</button>
+<pre id="output"></pre>
+
+<script>
+async function saveData(e){
+  e.preventDefault();
+  const name=document.getElementById('name').value;
+  const email=document.getElementById('email').value;
+
+  await fetch('/save',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name,email})
+  });
+  alert('Saved!');
+}
+
+async function getData(){
+  const res=await fetch('/list');
+  const data=await res.json();
+  document.getElementById('output').innerText=JSON.stringify(data,null,2);
+}
+</script>
+</body>
+</html>
