@@ -9,7 +9,7 @@ jobs:
 
     env:
       USERNAME: ${{ secrets.DOCKER_USERNAME }}   # DockerHub username
-      IMAGE_NAME: myapp                           # Change to your app name
+      IMAGE_NAME: test248                           # Change to your app name
 
     steps:
       - name: Checkout Repository
@@ -29,8 +29,6 @@ jobs:
         with:
           context: .
           file: appbox/dockertest/Dockerfile
-          push: true
+          push: true 
           tags: ${{ env.USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
-      - name: Print Success Message
-        run: echo "Image pushed: $USERNAME/$IMAGE_NAME:latest"
