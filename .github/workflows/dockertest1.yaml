@@ -17,17 +17,21 @@ jobs:
 
       - name: 🔧 Generate Short SHA (12 chars)
         id: sha
-        run: echo "SHORT_SHA=${GITHUB_SHA::12}" >> $GITHUB_ENV
+        shell: pwsh
+        run: |
+          $short = $env:GITHUB_SHA.Substring(0, 12)
+          echo "SHORT_SHA=$short" >> $env:GITHUB_ENV
 
       - name: 🔨 Build Docker Image (Local)
+        shell: pwsh
         run: |
-          echo "Using SHA Tag: $SHORT_SHA"
+          echo "Using SHA Tag: $env:SHORT_SHA"
           docker build `
             --file appbox/dockertest/Dockerfile `
             . `
-            --tag ${{ env.IMAGE_NAME }}:local `
-            --tag ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:$SHORT_SHA `
-            --tag ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+            --tag $env:IMAGE_NAME:local `
+            --tag $env:DOCKER_HUB_USERNAME/$env:IMAGE_NAME:$env:SHORT_SHA `
+            --tag $env:DOCKER_HUB_USERNAME/$env:IMAGE_NAME:latest
 
       - name: 🔑 Login to Docker Hub
         uses: docker/login-action@v3
@@ -37,8 +41,9 @@ jobs:
           logout: true
 
       - name: ⬆️ Push Docker Images to Docker Hub
+        shell: pwsh
         run: |
           echo "Pushing Docker images..."
-          docker push ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:$SHORT_SHA
-          docker push ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-          echo "✅ Successfully pushed using tag: $SHORT_SHA"
+          docker push "$env:DOCKER_HUB_USERNAME/$env:IMAGE_NAME:$env:SHORT_SHA"
+          docker push "$env:DOCKER_HUB_USERNAME/$env:IMAGE_NAME:latest"
+          echo "✅ Successfully pushed using tag: $env:SHORT_SHA"
