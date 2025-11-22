@@ -1,7 +1,7 @@
-name: dockertesting10
+name: dockertesting1
 
 on:
-  workflow_dispatch: # Allows manual trigger from GitHub
+  workflow_dispatch:
 
 jobs:
   build_and_push:
@@ -10,23 +10,24 @@ jobs:
     env:
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       IMAGE_NAME: sangineedi
-      DOCKER_TAG: ${{ github.sha.substr(0,12) }}   # ✔️ 12-character SHA tag
 
     steps:
       - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
 
+      - name: 🔧 Generate Short SHA (12 chars)
+        id: sha
+        run: echo "SHORT_SHA=${GITHUB_SHA::12}" >> $GITHUB_ENV
+
       - name: 🔨 Build Docker Image (Local)
         run: |
-          echo "Building local Docker image..."
+          echo "Using SHA Tag: $SHORT_SHA"
           docker build `
             --file appbox/dockertest/Dockerfile `
             . `
             --tag ${{ env.IMAGE_NAME }}:local `
-            --tag ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} `
+            --tag ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:$SHORT_SHA `
             --tag ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-          
-          echo "✅ Local image built successfully: ${{ env.IMAGE_NAME }}:local"
 
       - name: 🔑 Login to Docker Hub
         uses: docker/login-action@v3
@@ -37,7 +38,7 @@ jobs:
 
       - name: ⬆️ Push Docker Images to Docker Hub
         run: |
-          echo "Pushing images to Docker Hub..."
-          docker push ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
+          echo "Pushing Docker images..."
+          docker push ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:$SHORT_SHA
           docker push ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-          echo "✅ Successfully pushed to Docker Hub"
+          echo "✅ Successfully pushed using tag: $SHORT_SHA"
