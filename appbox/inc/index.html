@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .inc {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        button{
+            font-size: 20px;
+            padding: 10px 20px;
+            background-color: #50c80f;
+            border-radius: 10px;
+            border: none;
+            color: white;
+        }
+        body{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="inc">0</div>
+    <button>click me 
+
+    </button>
+
+
+    
+    <script>
+        let button = document.querySelector("button");
+        let inc = document.querySelector(".inc");
+
+        button.addEventListener("click", function() {
+            let currentValue = parseInt(inc.textContent);
+            inc.textContent = currentValue + 1;
+        });
+    </script>
+
+</body>
+</html>
