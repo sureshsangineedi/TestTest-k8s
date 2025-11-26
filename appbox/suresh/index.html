@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suresh DevOps | Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fa-solid fa-terminal"></i> Suresh<span class="highlight">DevOps</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#skills">Skills</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="container hero-content">
+                <h1 class="fade-in-up">Automating the Future</h1>
+                <p class="subtitle fade-in-up delay-1">Expert in CI/CD, Cloud Infrastructure, and Containerization.</p>
+                <a href="#skills" class="btn fade-in-up delay-2">View Skills</a>
+            </div>
+        </section>
+
+        <section id="skills" class="skills-section">
+            <div class="container">
+                <h2 class="section-title">Technical Expertise</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="cloud">Cloud</button>
+                    <button class="filter-btn" data-filter="containerization">Containerization</button>
+                    <button class="filter-btn" data-filter="cicd">CI/CD</button>
+                    <button class="filter-btn" data-filter="iac">IaC</button>
+                    <button class="filter-btn" data-filter="monitoring">Monitoring</button>
+                </div>
+                <div class="skills-grid" id="skillsGrid">
+                    <!-- Skills will be injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact-section">
+            <div class="container">
+                <h2 class="section-title">Get In Touch</h2>
+                <div class="contact-content">
+                    <p class="fade-in-up">
+                        I'm Suresh, a Kubernetes expert passionate about building scalable and resilient infrastructure.
+                        Feel free to connect with me through the following platforms.
+                    </p>
+                    <div class="social-links fade-in-up delay-1">
+                        <a href="#" aria-label="LinkedIn" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="GitHub" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+                        <a href="mailto:your-email@example.com" aria-label="Email" class="social-icon"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Suresh DevOps...</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
