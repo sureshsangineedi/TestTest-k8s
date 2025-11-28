@@ -1,4 +1,4 @@
-name: Prometheus & Grafana (simple - windows)
+name: Prometheus & Grafana
 
 on:
   workflow_dispatch:
@@ -8,50 +8,101 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Add helm repos
-        shell: pwsh
+      # -----------------------------
+      # Set Default StorageClass
+      # -----------------------------
+      - name: Set Default StorageClass
+        shell: powershell
+        run: |
+          kubectl patch storageclass local-path --type=merge -p `
+          '{\"metadata\": {\"annotations\": {\"storageclass.kubernetes.io/is-default-class\": \"true\"}}}'
+
+      # -----------------------------
+      # Add Helm Repos
+      # -----------------------------
+      - name: Add Helm Repos
+        shell: powershell
         run: |
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo add grafana https://grafana.github.io/helm-charts
           helm repo update
 
-      - name: Install Prometheus (NodePort 32001, no persistence)
-        shell: pwsh
+      # -----------------------------
+      # Create Prometheus values
+      # -----------------------------
+      - name: Create prometheus-values.yaml
+        shell: powershell
         run: |
-          helm upgrade --install prometheus prometheus-community/prometheus `
-            --set server.service.type=NodePort `
-            --set server.service.nodePort=32001 `
-            --set server.persistentVolume.enabled=false
+          @"
+resources:
+  limits:
+    cpu: 200m
+    memory: 300Mi
+  requests:
+    cpu: 100m
+    memory: 200Mi
 
-      - name: Install Grafana (NodePort 32000, no persistence)
-        shell: pwsh
-        run: |
-          helm upgrade --install grafana grafana/grafana `
-            --set service.type=NodePort `
-            --set service.nodePort=32000 `
-            --set persistence.enabled=false
+server:
+  service:
+    type: NodePort
+    nodePort: 32001
+  persistentVolume:
+    enabled: true
+    size: 2Gi
+    storageClass: "local-path"
 
-      - name: Get Grafana admin password (PowerShell decode)
-        shell: pwsh
+alertmanager:
+  persistentVolume:
+    enabled: true
+    size: 1Gi
+    storageClass: "local-path"
+"@ | Out-File -FilePath prometheus-values.yaml -Encoding utf8
+
+      - name: Install Prometheus
+        shell: powershell
         run: |
-          # wait up to 60s for secret
-          $ready = $false
-          for ($i=0; $i -lt 12; $i++) {
-            if (kubectl get secret grafana -o name -ErrorAction SilentlyContinue) { $ready = $true; break }
-            Start-Sleep -Seconds 5
-          }
-          if ($ready) {
-            $encoded = kubectl get secret grafana -o jsonpath="{.data.admin-password}"
-            if ($encoded) {
-              $bytes = [System.Convert]::FromBase64String($encoded)
-              $decoded = [System.Text.Encoding]::UTF8.GetString($bytes)
-              Write-Host "Grafana admin password: $decoded"
-            } else {
-              Write-Host "Grafana secret found but admin-password is empty."
-            }
-          } else {
-            Write-Host "Grafana secret not found after waiting."
-          }
+          helm upgrade --install prometheus prometheus-community/prometheus -f prometheus-values.yaml
+
+      # -----------------------------
+      # Create Grafana values
+      # -----------------------------
+      - name: Create grafana-values.yaml
+        shell: powershell
+        run: |
+          @"
+resources:
+  limits:
+    cpu: 150m
+    memory: 200Mi
+  requests:
+    cpu: 50m
+    memory: 100Mi
+
+service:
+  type: NodePort
+  nodePort: 32000
+
+persistence:
+  enabled: true
+  size: 2Gi
+  storageClassName: "local-path"
+"@ | Out-File -FilePath grafana-values.yaml -Encoding utf8
+
+      - name: Install Grafana
+        shell: powershell
+        run: |
+          helm upgrade --install grafana grafana/grafana -f grafana-values.yaml
+
+      # -----------------------------
+      # Get Grafana Admin Password
+      # -----------------------------
+      - name: Get Grafana Admin Password
+        shell: powershell
+        run: |
+          $encoded = kubectl get secret grafana -o jsonpath="{.data.admin-password}"
+          $bytes = [System.Convert]::FromBase64String($encoded)
+          $decoded = [System.Text.Encoding]::UTF8.GetString($bytes)
+          Write-Host "Grafana Admin Password: $decoded"
