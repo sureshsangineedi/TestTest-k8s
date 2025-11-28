@@ -1,0 +1,112 @@
+name: Prometheus & Grafana
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Monitoring Stack
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ------------------------------------------------------
+      # FIX: Set Default StorageClass (Windows Safe)
+      # ------------------------------------------------------
+      - name: Set Default StorageClass
+        shell: pwsh
+        run: |
+          kubectl patch storageclass local-path --type=merge -p `
+          '{\"metadata\": {\"annotations\": {\"storageclass.kubernetes.io/is-default-class\": \"true\"}}}'
+
+      # ------------------------------------------------------
+      # HELM REPOS
+      # ------------------------------------------------------
+      - name: Add Helm Repos
+        shell: pwsh
+        run: |
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo update
+
+      # ------------------------------------------------------
+      # PROMETHEUS VALUES
+      # ------------------------------------------------------
+      - name: Create Prometheus values.yaml
+        shell: pwsh
+        run: |
+          @"
+resources:
+  limits:
+    cpu: 200m
+    memory: 300Mi
+  requests:
+    cpu: 100m
+    memory: 200Mi
+
+server:
+  service:
+    type: NodePort
+    nodePort: 32001
+  persistentVolume:
+    enabled: true
+    size: 2Gi
+    storageClass: "local-path"
+
+alertmanager:
+  persistentVolume:
+    enabled: true
+    size: 1Gi
+    storageClass: "local-path"
+"@ | Out-File prometheus-values.yaml -Encoding utf8
+
+      - name: Install Prometheus
+        shell: pwsh
+        run: |
+          helm upgrade --install prometheus prometheus-community/prometheus -f prometheus-values.yaml
+
+      # ------------------------------------------------------
+      # GRAFANA VALUES
+      # ------------------------------------------------------
+      - name: Create Grafana values.yaml
+        shell: pwsh
+        run: |
+          @"
+resources:
+  limits:
+    cpu: 150m
+    memory: 200Mi
+  requests:
+    cpu: 50m
+    memory: 100Mi
+
+service:
+  type: NodePort
+  nodePort: 32000
+
+persistence:
+  enabled: true
+  size: 2Gi
+  storageClassName: "local-path"
+"@ | Out-File grafana-values.yaml -Encoding utf8
+
+      - name: Install Grafana
+        shell: pwsh
+        run: |
+          helm upgrade --install grafana grafana/grafana -f grafana-values.yaml
+
+      # ------------------------------------------------------
+      # GET GRAFANA PASSWORD (Windows Safe)
+      # ------------------------------------------------------
+      - name: Get Grafana Admin Password
+        shell: pwsh
+        run: |
+          $encoded = kubectl get secret grafana -o jsonpath="{.data.admin-password}"
+          $bytes = [System.Convert]::FromBase64String($encoded)
+          $decoded = [System.Text.Encoding]::UTF8.GetString($bytes)
+          Write-Host "Grafana Admin Password: $decoded"
