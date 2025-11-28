@@ -1,4 +1,4 @@
-name: Grafana
+name: Prometheus & Grafana
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       # ------------------------------------------------------
-      # FIXED WINDOWS-COMPATIBLE STORAGECLASS PATCH
+      # FIX: Set Default StorageClass (Windows Safe)
       # ------------------------------------------------------
       - name: Set Default StorageClass
         shell: pwsh
@@ -101,7 +101,7 @@ persistence:
           helm upgrade --install grafana grafana/grafana -f grafana-values.yaml
 
       # ------------------------------------------------------
-      # GET GRAFANA PASSWORD (Windows-safe Base64 decode)
+      # GET GRAFANA PASSWORD (Windows Safe)
       # ------------------------------------------------------
       - name: Get Grafana Admin Password
         shell: pwsh
