@@ -22,7 +22,7 @@ jobs:
 
       - name: Create NodePort Service
         run: |
-          kubectl expose pod nginx-pod \
+          kubectl expose pod nginx-pod1 \
             --name=nginx-service \
             --port=80 \
             --target-port=80 \
