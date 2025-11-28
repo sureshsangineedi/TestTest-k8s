@@ -17,93 +17,99 @@ jobs:
 
       # - name: Configure kubeconfig (optional)
       #   if: ${{ secrets.KUBECONFIG_DATA != '' }}
+      #   shell: pwsh
       #   run: |
-      #     echo "${{ secrets.KUBECONFIG_DATA }}" > kubeconfig
-      #     export KUBECONFIG=$PWD/kubeconfig
+      #     "${{ secrets.KUBECONFIG_DATA }}" | Out-File -FilePath kubeconfig -Encoding utf8
+      #     $env:KUBECONFIG = "$(PWD)\kubeconfig"
+      #     kubectl get nodes
 
-      - name: Verify Kubernetes Access
-        run: kubectl get nodes
-
-      #----------------------------------------------------------
-      # Default StorageClass Patch
-      #----------------------------------------------------------
+      # ------------------------------------------------------
+      # FIXED WINDOWS-COMPATIBLE STORAGECLASS PATCH
+      # ------------------------------------------------------
       - name: Set Default StorageClass
+        shell: pwsh
         run: |
-          kubectl patch storageclass local-path --type=merge -p \
-          "{\"metadata\": {\"annotations\": {\"storageclass.kubernetes.io/is-default-class\": \"true\"}}}"
+          kubectl patch storageclass local-path --type=merge -p `
+          '{\"metadata\": {\"annotations\": {\"storageclass.kubernetes.io/is-default-class\": \"true\"}}}'
 
-      #----------------------------------------------------------
-      # Helm Repos
-      #----------------------------------------------------------
+      # ------------------------------------------------------
+      # HELM REPOS
+      # ------------------------------------------------------
       - name: Add Helm Repositories
+        shell: pwsh
         run: |
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo add grafana https://grafana.github.io/helm-charts
           helm repo update
 
-      #----------------------------------------------------------
-      # Prometheus values.yaml (WITH NODEPORT)
-      #----------------------------------------------------------
+      # ------------------------------------------------------
+      # PROMETHEUS VALUES (NodePort 32001)
+      # ------------------------------------------------------
       - name: Create Prometheus values.yaml
+        shell: pwsh
         run: |
-          cat <<EOF > prometheus-values.yaml
-          resources:
-            limits:
-              cpu: 200m
-              memory: 300Mi
-            requests:
-              cpu: 100m
-              memory: 200Mi
+          @"
+resources:
+  limits:
+    cpu: 200m
+    memory: 300Mi
+  requests:
+    cpu: 100m
+    memory: 200Mi
 
-          server:
-            service:
-              type: NodePort
-              nodePort: 32001     # <--- PROMETHEUS NODEPORT
-            persistentVolume:
-              enabled: true
-              size: 2Gi
-              storageClass: "local-path"
+server:
+  service:
+    type: NodePort
+    nodePort: 32001
+  persistentVolume:
+    enabled: true
+    size: 2Gi
+    storageClass: "local-path"
 
-          alertmanager:
-            persistentVolume:
-              enabled: true
-              size: 1Gi
-              storageClass: "local-path"
-          EOF
+alertmanager:
+  persistentVolume:
+    enabled: true
+    size: 1Gi
+    storageClass: "local-path"
+"@ | Out-File -FilePath prometheus-values.yaml -Encoding utf8
 
       - name: Install Prometheus
+        shell: pwsh
         run: |
           helm upgrade --install prometheus prometheus-community/prometheus -f prometheus-values.yaml
 
-      #----------------------------------------------------------
-      # Grafana values.yaml (WITH NODEPORT)
-      #----------------------------------------------------------
+      # ------------------------------------------------------
+      # GRAFANA VALUES (NodePort 32000)
+      # ------------------------------------------------------
       - name: Create Grafana values.yaml
+        shell: pwsh
         run: |
-          cat <<EOF > grafana-values.yaml
-          resources:
-            limits:
-              cpu: 150m
-              memory: 200Mi
-            requests:
-              cpu: 50m
-              memory: 100Mi
+          @"
+resources:
+  limits:
+    cpu: 150m
+    memory: 200Mi
+  requests:
+    cpu: 50m
+    memory: 100Mi
 
-          service:
-            type: NodePort
-            nodePort: 32000      # <--- GRAFANA NODEPORT
+service:
+  type: NodePort
+  nodePort: 32000
 
-          persistence:
-            enabled: true
-            size: 2Gi
-            storageClassName: "local-path"
-          EOF
+persistence:
+  enabled: true
+  size: 2Gi
+  storageClassName: "local-path"
+"@ | Out-File -FilePath grafana-values.yaml -Encoding utf8
 
       - name: Install Grafana
+        shell: pwsh
         run: |
           helm upgrade --install grafana grafana/grafana -f grafana-values.yaml
 
       - name: Get Grafana Admin Password
+        shell: pwsh
         run: |
-          echo "Grafana Admin Password:"
+          Write-Host "Grafana Admin Password:"
           kubectl get secret grafana -o jsonpath="{.data.admin-password}" | base64 --decode
