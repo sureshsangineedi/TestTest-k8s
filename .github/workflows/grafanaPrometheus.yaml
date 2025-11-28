@@ -1,4 +1,4 @@
-name: Deploy Prometheus & Grafana
+name: Prometheus & Grafana
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy Monitoring Stack
+    name: Deploy Monitoring Stack 
     runs-on: self-hosted
 
     steps:
