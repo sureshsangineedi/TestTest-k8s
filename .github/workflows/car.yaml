@@ -1,4 +1,4 @@
-name: Deploy Car Pod to Kubernetes
+name: car single pod
 
 on:
   workflow_dispatch:
