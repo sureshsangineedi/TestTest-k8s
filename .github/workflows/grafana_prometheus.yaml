@@ -1,0 +1,109 @@
+name: Deploy Prometheus & Grafana
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Monitoring Stack
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # - name: Configure kubeconfig (optional)
+      #   if: ${{ secrets.KUBECONFIG_DATA != '' }}
+      #   run: |
+      #     echo "${{ secrets.KUBECONFIG_DATA }}" > kubeconfig
+      #     export KUBECONFIG=$PWD/kubeconfig
+
+      - name: Verify Kubernetes Access
+        run: kubectl get nodes
+
+      #----------------------------------------------------------
+      # Default StorageClass Patch
+      #----------------------------------------------------------
+      - name: Set Default StorageClass
+        run: |
+          kubectl patch storageclass local-path --type=merge -p \
+          "{\"metadata\": {\"annotations\": {\"storageclass.kubernetes.io/is-default-class\": \"true\"}}}"
+
+      #----------------------------------------------------------
+      # Helm Repos
+      #----------------------------------------------------------
+      - name: Add Helm Repositories
+        run: |
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo update
+
+      #----------------------------------------------------------
+      # Prometheus values.yaml (WITH NODEPORT)
+      #----------------------------------------------------------
+      - name: Create Prometheus values.yaml
+        run: |
+          cat <<EOF > prometheus-values.yaml
+          resources:
+            limits:
+              cpu: 200m
+              memory: 300Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+
+          server:
+            service:
+              type: NodePort
+              nodePort: 32001     # <--- PROMETHEUS NODEPORT
+            persistentVolume:
+              enabled: true
+              size: 2Gi
+              storageClass: "local-path"
+
+          alertmanager:
+            persistentVolume:
+              enabled: true
+              size: 1Gi
+              storageClass: "local-path"
+          EOF
+
+      - name: Install Prometheus
+        run: |
+          helm upgrade --install prometheus prometheus-community/prometheus -f prometheus-values.yaml
+
+      #----------------------------------------------------------
+      # Grafana values.yaml (WITH NODEPORT)
+      #----------------------------------------------------------
+      - name: Create Grafana values.yaml
+        run: |
+          cat <<EOF > grafana-values.yaml
+          resources:
+            limits:
+              cpu: 150m
+              memory: 200Mi
+            requests:
+              cpu: 50m
+              memory: 100Mi
+
+          service:
+            type: NodePort
+            nodePort: 32000      # <--- GRAFANA NODEPORT
+
+          persistence:
+            enabled: true
+            size: 2Gi
+            storageClassName: "local-path"
+          EOF
+
+      - name: Install Grafana
+        run: |
+          helm upgrade --install grafana grafana/grafana -f grafana-values.yaml
+
+      - name: Get Grafana Admin Password
+        run: |
+          echo "Grafana Admin Password:"
+          kubectl get secret grafana -o jsonpath="{.data.admin-password}" | base64 --decode
