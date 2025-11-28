@@ -12,8 +12,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -25,4 +26,4 @@ jobs:
     - name: Run tests
       run: |
         cd src
-        python -m pytest addition.py
+        pytest addition.py
