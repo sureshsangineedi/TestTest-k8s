@@ -1,0 +1,29 @@
+name: box single pod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+ 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Cleanup Old Pod
+        run: |
+          kubectl delete pod box-pod --ignore-not-found=true
+
+      - name: Create box Pod
+        run: |
+          kubectl run box-pod --image=nginx:latest
+
+      - name: Verify Deployment
+        run: |
+          kubectl get pod single-pod -o wide
