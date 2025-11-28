@@ -1,11 +1,11 @@
 name: Deploy Single Pod to Kubernetes
 
 on:
-  workflow_dispatch:   # Manual trigger
+  workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: self-hosted   # Using your self-hosted runner
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
