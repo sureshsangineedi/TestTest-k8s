@@ -15,14 +15,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # - name: Configure kubeconfig (optional)
-      #   if: ${{ secrets.KUBECONFIG_DATA != '' }}
-      #   shell: pwsh
-      #   run: |
-      #     "${{ secrets.KUBECONFIG_DATA }}" | Out-File -FilePath kubeconfig -Encoding utf8
-      #     $env:KUBECONFIG = "$(PWD)\kubeconfig"
-      #     kubectl get nodes
-
       # ------------------------------------------------------
       # FIXED WINDOWS-COMPATIBLE STORAGECLASS PATCH
       # ------------------------------------------------------
@@ -108,8 +100,13 @@ persistence:
         run: |
           helm upgrade --install grafana grafana/grafana -f grafana-values.yaml
 
+      # ------------------------------------------------------
+      # GET GRAFANA PASSWORD (Windows-safe Base64 decode)
+      # ------------------------------------------------------
       - name: Get Grafana Admin Password
         shell: pwsh
         run: |
-          Write-Host "Grafana Admin Password:"
-          kubectl get secret grafana -o jsonpath="{.data.admin-password}" | base64 --decode
+          $encoded = kubectl get secret grafana -o jsonpath="{.data.admin-password}"
+          $bytes = [System.Convert]::FromBase64String($encoded)
+          $decoded = [System.Text.Encoding]::UTF8.GetString($bytes)
+          Write-Host "Grafana Admin Password: $decoded"
