@@ -1,0 +1,29 @@
+name: Deploy Car Pod to Kubernetes
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Cleanup Old Pod
+        run: |
+          kubectl delete pod car-pod --ignore-not-found=true
+
+      - name: Create Car Pod
+        run: |
+          kubectl run car-pod --image=nginx:latest
+
+      - name: Verify Deployment
+        run: |
+          kubectl get pod car-pod -o wide
