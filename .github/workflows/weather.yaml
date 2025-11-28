@@ -20,7 +20,7 @@ jobs:
         run: |
           echo "Building local Docker image..."
           docker build `
-            --file appbox/gym/Dockerfile `
+            --file appbox/watherapp/Dockerfile `
             . `
             --tag ${{ env.IMAGE_NAME }}:local `
             --tag ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }} `
@@ -44,7 +44,7 @@ jobs:
 #  Deploy to Kubernetes
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f appbox\weatherapp\k8s\gymdeploy.yaml
+          kubectl apply -f appbox/watherapp/k8s/weatherdploy.yaml
           echo "----- Pods -----"
           kubectl get pods
           echo "----- Services -----"
