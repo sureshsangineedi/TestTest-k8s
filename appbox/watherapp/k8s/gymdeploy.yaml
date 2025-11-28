@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-app
+  labels:
+    app: weather-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather-app
+  template:
+    metadata:
+      labels:
+        app: weather-app
+    spec:
+      containers:
+      - name: weather-app
+        image: suresh2dev2/weather-app:latest  # replace with your image
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather-app-service
+spec:
+  selector:
+    app: weather-app
+  type: NodePort   # For external access in most clusters
+  ports:
+  - protocol: TCP
+    port: 8080         # External service port
+    targetPort: 80     # Container port inside the pod
+    nodePort: 30048    # Optional: specify NodePort (30000–32767 range)
