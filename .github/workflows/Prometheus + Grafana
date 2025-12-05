@@ -1,0 +1,77 @@
+name: (Prometheus + Grafana)
+
+on:
+  workflow_dispatch:   # Manual trigger only
+
+jobs:
+  deploy:
+    runs-on: self-hosted   # <--- Use your self-hosted runner
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "v1.30.0"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: "v3.14.0"
+
+      - name: Add Prometheus Community Repo
+        run: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+      - name: Add Grafana Repo
+        run: helm repo add grafana https://grafana.github.io/helm-charts
+
+      - name: Update Helm Repos
+        run: helm repo update
+
+      # ---------------- MINIMAL RESOURCE CONFIG ------------------
+      - name: Create minimal-values.yaml
+        run: |
+          cat <<EOF > minimal-values.yaml
+          grafana:
+            enabled: true
+            adminPassword: "admin"
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                cpu: 100m
+                memory: 256Mi
+            service:
+              type: NodePort
+              nodePort: 32000
+
+          prometheus:
+            prometheusSpec:
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 200m
+                  memory: 512Mi
+              retention: 12h
+
+          alertmanager:
+            enabled: false
+
+          kubeStateMetrics:
+            enabled: false
+
+          nodeExporter:
+            enabled: false
+          EOF
+
+      # ---------------- INSTALL PROMETHEUS + GRAFANA ------------------
+      - name: Install kube-prometheus-stack (minimal)
+        run: |
+          helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
+            --namespace monitoring --create-namespace \
+            -f minimal-values.yaml
