@@ -5,14 +5,14 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted   # your Windows runner
+    runs-on: self-hosted   # Windows runner
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
       # -------------------------------------------------------------
-      # FIX: Install kubectl on Windows (ZIP only, NO tar.gz)
+      # Install kubectl safely on Windows
       # -------------------------------------------------------------
       - name: Install kubectl (Windows Safe)
         run: |
@@ -22,7 +22,7 @@ jobs:
           echo "C:\tools\kubectl" | Out-File -Append -FilePath $env:GITHUB_PATH
 
       # -------------------------------------------------------------
-      # FIX: Install Helm using ZIP (NO tar.gz)
+      # Install Helm (Windows ZIP only)
       # -------------------------------------------------------------
       - name: Install Helm (Windows Safe)
         run: |
@@ -38,7 +38,7 @@ jobs:
           helm version
 
       # -------------------------------------------------------------
-      # Add Helm Repos
+      # Helm Repos
       # -------------------------------------------------------------
       - name: Add Prometheus Community Repo
         run: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -50,48 +50,48 @@ jobs:
         run: helm repo update
 
       # -------------------------------------------------------------
-      # Minimal resource values file
+      # Create minimal-values.yaml (Windows Safe)
       # -------------------------------------------------------------
       - name: Create minimal-values.yaml
         run: |
-          cat <<EOF > minimal-values.yaml
-          grafana:
-            enabled: true
-            adminPassword: "admin"
-            resources:
-              requests:
-                cpu: 50m
-                memory: 128Mi
-              limits:
-                cpu: 100m
-                memory: 256Mi
-            service:
-              type: NodePort
-              nodePort: 32000
+          @"
+grafana:
+  enabled: true
+  adminPassword: admin
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+  service:
+    type: NodePort
+    nodePort: 32000
 
-          prometheus:
-            prometheusSpec:
-              resources:
-                requests:
-                  cpu: 100m
-                  memory: 256Mi
-                limits:
-                  cpu: 200m
-                  memory: 512Mi
-              retention: 12h
+prometheus:
+  prometheusSpec:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi
+    retention: 12h
 
-          alertmanager:
-            enabled: false
+alertmanager:
+  enabled: false
 
-          kubeStateMetrics:
-            enabled: false
+kubeStateMetrics:
+  enabled: false
 
-          nodeExporter:
-            enabled: false
-          EOF
+nodeExporter:
+  enabled: false
+"@ | Out-File -FilePath minimal-values.yaml -Encoding utf8
 
       # -------------------------------------------------------------
-      # Install Prometheus + Grafana
+      # Install kube-prometheus-stack
       # -------------------------------------------------------------
       - name: Install kube-prometheus-stack (minimal)
         run: |
