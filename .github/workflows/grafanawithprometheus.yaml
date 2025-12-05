@@ -1,100 +1,47 @@
-name: (Prometheus + Grafana)
+name: Install Prometheus + Grafana
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:    # Manual trigger
 
 jobs:
-  deploy:
-    runs-on: self-hosted   # Windows runner
+  install-monitoring:
+    runs-on: self-hosted   # Your own runner
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      # -------------------------------------------------------------
-      # Install kubectl safely on Windows
-      # -------------------------------------------------------------
-      - name: Install kubectl (Windows Safe)
-        run: |
-          curl.exe -LO "https://dl.k8s.io/release/v1.30.0/bin/windows/amd64/kubectl.exe"
-          mkdir C:\tools\kubectl
-          move kubectl.exe C:\tools\kubectl\kubectl.exe
-          echo "C:\tools\kubectl" | Out-File -Append -FilePath $env:GITHUB_PATH
+    - name: Verify kubectl access
+      run: |
+        kubectl get nodes
 
-      # -------------------------------------------------------------
-      # Install Helm (Windows ZIP only)
-      # -------------------------------------------------------------
-      - name: Install Helm (Windows Safe)
-        run: |
-          curl.exe -LO "https://get.helm.sh/helm-v3.14.0-windows-amd64.zip"
-          Expand-Archive helm-v3.14.0-windows-amd64.zip -DestinationPath .
-          mkdir C:\tools\helm
-          move windows-amd64\helm.exe C:\tools\helm\helm.exe
-          echo "C:\tools\helm" | Out-File -Append -FilePath $env:GITHUB_PATH
+    - name: Add Helm Repos
+      run: |
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        helm repo add grafana https://grafana.github.io/helm-charts
+        helm repo update
 
-      - name: Verify Tools
-        run: |
-          kubectl version --client
-          helm version
+    - name: Create Namespace (monitoring)
+      run: |
+        kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 
-      # -------------------------------------------------------------
-      # Helm Repos
-      # -------------------------------------------------------------
-      - name: Add Prometheus Community Repo
-        run: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    - name: Install Prometheus
+      run: |
+        helm upgrade --install prometheus prometheus-community/prometheus \
+        --namespace monitoring \
+        --set server.resources.limits.cpu="200m" \
+        --set server.resources.limits.memory="512Mi" \
+        --set server.persistentVolume.enabled=false
 
-      - name: Add Grafana Repo
-        run: helm repo add grafana https://grafana.github.io/helm-charts
+    - name: Install Grafana
+      run: |
+        helm upgrade --install grafana grafana/grafana \
+        --namespace monitoring \
+        --set persistence.enabled=false \
+        --set adminPassword="admin" \
+        --set resources.limits.cpu="200m" \
+        --set resources.limits.memory="512Mi"
 
-      - name: Update Helm Repos
-        run: helm repo update
-
-      # -------------------------------------------------------------
-      # Create minimal-values.yaml (Windows Safe)
-      # -------------------------------------------------------------
-      - name: Create minimal-values.yaml
-        run: |
-          @"
-grafana:
-  enabled: true
-  adminPassword: admin
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 100m
-      memory: 256Mi
-  service:
-    type: NodePort
-    nodePort: 32000
-
-prometheus:
-  prometheusSpec:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        cpu: 200m
-        memory: 512Mi
-    retention: 12h
-
-alertmanager:
-  enabled: false
-
-kubeStateMetrics:
-  enabled: false
-
-nodeExporter:
-  enabled: false
-"@ | Out-File -FilePath minimal-values.yaml -Encoding utf8
-
-      # -------------------------------------------------------------
-      # Install kube-prometheus-stack
-      # -------------------------------------------------------------
-      - name: Install kube-prometheus-stack (minimal)
-        run: |
-          helm upgrade --install monitoring prometheus-community/kube-prometheus-stack `
-            --namespace monitoring --create-namespace `
-            -f minimal-values.yaml
+    - name: Show Services
+      run: |
+        kubectl get svc -n monitoring
