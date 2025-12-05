@@ -1,26 +1,45 @@
 name: (Prometheus + Grafana)
 
 on:
-  workflow_dispatch:   # Manual trigger only
+  workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: self-hosted   # <--- Use your self-hosted runner
+    runs-on: self-hosted   # your Windows runner
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: "v1.30.0"
+      # -------------------------------------------------------------
+      # FIX: Install kubectl on Windows (ZIP only, NO tar.gz)
+      # -------------------------------------------------------------
+      - name: Install kubectl (Windows Safe)
+        run: |
+          curl.exe -LO "https://dl.k8s.io/release/v1.30.0/bin/windows/amd64/kubectl.exe"
+          mkdir C:\tools\kubectl
+          move kubectl.exe C:\tools\kubectl\kubectl.exe
+          echo "C:\tools\kubectl" | Out-File -Append -FilePath $env:GITHUB_PATH
 
-      - name: Install Helm
-        uses: azure/setup-helm@v3
-        with:
-          version: "v3.14.0"
+      # -------------------------------------------------------------
+      # FIX: Install Helm using ZIP (NO tar.gz)
+      # -------------------------------------------------------------
+      - name: Install Helm (Windows Safe)
+        run: |
+          curl.exe -LO "https://get.helm.sh/helm-v3.14.0-windows-amd64.zip"
+          Expand-Archive helm-v3.14.0-windows-amd64.zip -DestinationPath .
+          mkdir C:\tools\helm
+          move windows-amd64\helm.exe C:\tools\helm\helm.exe
+          echo "C:\tools\helm" | Out-File -Append -FilePath $env:GITHUB_PATH
 
+      - name: Verify Tools
+        run: |
+          kubectl version --client
+          helm version
+
+      # -------------------------------------------------------------
+      # Add Helm Repos
+      # -------------------------------------------------------------
       - name: Add Prometheus Community Repo
         run: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 
@@ -30,7 +49,9 @@ jobs:
       - name: Update Helm Repos
         run: helm repo update
 
-      # ---------------- MINIMAL RESOURCE CONFIG ------------------
+      # -------------------------------------------------------------
+      # Minimal resource values file
+      # -------------------------------------------------------------
       - name: Create minimal-values.yaml
         run: |
           cat <<EOF > minimal-values.yaml
@@ -69,9 +90,11 @@ jobs:
             enabled: false
           EOF
 
-      # ---------------- INSTALL PROMETHEUS + GRAFANA ------------------
+      # -------------------------------------------------------------
+      # Install Prometheus + Grafana
+      # -------------------------------------------------------------
       - name: Install kube-prometheus-stack (minimal)
         run: |
-          helm upgrade --install monitoring prometheus-community/kube-prometheus-stack \
-            --namespace monitoring --create-namespace \
+          helm upgrade --install monitoring prometheus-community/kube-prometheus-stack `
+            --namespace monitoring --create-namespace `
             -f minimal-values.yaml
