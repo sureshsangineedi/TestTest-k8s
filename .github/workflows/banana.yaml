@@ -7,7 +7,7 @@ jobs:
   build_and_push:
     runs-on: ubuntu-latest
 
-    env:
+    env: 
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       IMAGE_NAME: banana
       DOCKER_TAG: ${{ github.sha }}
