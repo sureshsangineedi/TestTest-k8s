@@ -33,5 +33,5 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-        kubectl apply -f k8s-deployment.yaml
+        kubectl apply -f appbox/drinkingwater/k8s/k8s-deployment.yaml
         kubectl get pods
