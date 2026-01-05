@@ -20,7 +20,7 @@ jobs:
 
     - name: Build Docker Image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/water-reminder:latest .
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/water-reminder:latest appbox/drinkingwater
 
     - name: Push Docker Image
       run: |
