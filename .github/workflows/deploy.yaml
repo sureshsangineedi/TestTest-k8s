@@ -1,42 +1,71 @@
-name: Build & Deploy Water Reminder
+name: Docker Build and Kubernetes Weather App
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:   # Manual trigger from GitHub UI
 
 jobs:
-  deploy:
-    runs-on: self-hosted
+  build_and_push:
+    runs-on: [self-hosted, windows]
+
+    env:
+      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      IMAGE_NAME: weather-app
+      DOCKER_TAG: ${{ github.sha }}
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
+      - name: 🔨 Build Docker Image (Local)
+        shell: powershell
         run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login \
-          -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          Write-Host "Building local Docker image..."
 
-      - name: Build Docker Image
+          docker build `
+            --file appbox/watherapp/Dockerfile `
+            . `
+            --tag $env:IMAGE_NAME:local `
+            --tag $env:DOCKER_HUB_USERNAME/$env:IMAGE_NAME:$env:DOCKER_TAG `
+            --tag $env:DOCKER_HUB_USERNAME/$env:IMAGE_NAME:latest
+
+          Write-Host "✅ Local image built successfully: $env:IMAGE_NAME:local"
+
+      - name: 🔑 Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          logout: true
+
+      - name: ⬆️ Push Docker Images to Docker Hub
+        shell: powershell
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/water-reminder:latest appbox/drinkingwater
+          Write-Host "Pushing images to Docker Hub..."
+          docker push $env:DOCKER_HUB_USERNAME/$env:IMAGE_NAME:$env:DOCKER_TAG
+          docker push $env:DOCKER_HUB_USERNAME/$env:IMAGE_NAME:latest
+          Write-Host "✅ Successfully pushed to Docker Hub"
 
-      - name: Push Docker Image
+      # ---------------- KUBERNETES ----------------
+
+      - name: ⚙️ Set Kubernetes Config
+        shell: powershell
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/water-reminder:latest
+          Write-Host "Setting kubeconfig..."
+          $env:KUBE_CONFIG | Out-File kubeconfig.b64
+          certutil -decode kubeconfig.b64 kubeconfig
+          echo "KUBECONFIG=$PWD\kubeconfig" >> $env:GITHUB_ENV
 
-      - name: Set Kubernetes Config
-        run: |
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > kubeconfig
-          echo "KUBECONFIG=$PWD/kubeconfig" >> $GITHUB_ENV
-
-      - name: Verify Kubernetes Connection
+      - name: 🔍 Verify Kubernetes Connection
+        shell: powershell
         run: |
           kubectl cluster-info
           kubectl get nodes
 
-      - name: Deploy to Kubernetes
+      - name: 🚀 Deploy to Kubernetes
+        shell: powershell
         run: |
-          kubectl apply -f appbox/drinkingwater/k8s/k8s-deployment.yaml
+          kubectl apply -f appbox/watherapp/k8s/weatherdploy.yaml
+          Write-Host "----- Pods -----"
           kubectl get pods
+          Write-Host "----- Services -----"
+          kubectl get svc
