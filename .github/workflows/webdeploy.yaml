@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker Image
-        run: docker build -t my-website .
+        run: docker build -t my-website ./website
 
       - name: Run Container
         run: |
