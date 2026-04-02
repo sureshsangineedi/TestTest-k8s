@@ -18,9 +18,9 @@ steps:
 
   - name: 🔨 Build Docker Image
     run: |
-      docker build -t ${{ secrets.DOCKER_USERNAME }}/weather-app:latest .
+      docker build -t ${{ secrets.DOCKER_USERNAME }}/gouthami-app:latest .
 
   - name: ⬆️ Push to Docker Hub
     run: |
-      docker push ${{ secrets.DOCKER_USERNAME }}/weather-app:latest
+      docker push ${{ secrets.DOCKER_USERNAME }}/gouthami-app:latest
 ```
