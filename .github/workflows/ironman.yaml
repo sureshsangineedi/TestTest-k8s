@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'appbox/secondfolder/**'   # 👈 only trigger when this folder changes
+      - 'appbox/ironman/**'   # 👈 only trigger when this folder changes
   workflow_dispatch:              # 👈 allow manual run
 
 jobs:
