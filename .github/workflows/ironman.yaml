@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'appbox/ironman/**'   # 👈 only trigger when this folder changes
-  workflow_dispatch:              # 👈 allow manual run
+  workflow_dispatch:              # 👈 allow manual run 
 
 jobs:
   build-and-push:
