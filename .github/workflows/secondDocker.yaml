@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'appbox/secondfolder/**'   # 👈 only trigger when this folder changes
+  workflow_dispatch:              # 👈 allow manual run
 
 jobs:
   build-and-push:
@@ -19,10 +22,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: 🔍 Debug Folder Structure
+        run: |
+          ls -R
+
       - name: 🔨 Build Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/secondDocker:latest ./appbox/secondfolder
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/seconddocker:latest ./appbox/secondfolder
 
       - name: 🚀 Push Docker Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/secondDocker:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/seconddocker:latest
