@@ -21,15 +21,4 @@ spec:
         - "-text=milkapp"
         ports:
         - containerPort: 5678
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: milkapp-service
-spec:
-  selector:
-    app: milkapp
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5678
+
