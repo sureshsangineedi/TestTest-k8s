@@ -1,3 +1,4 @@
+```yaml
 name: milkapp-workflow
 
 on:
@@ -13,10 +14,11 @@ jobs:
       DOCKER_TAG: ${{ github.sha }}
 
     steps:
-      - name: ⬇️ Checkout Repository
+
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🔨 Build Docker Image (Local)
+      - name: Build Docker Image
         shell: powershell
         run: |
           echo "Building local Docker image..."
@@ -28,16 +30,16 @@ jobs:
             --tag "${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}" `
             --tag "${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest"
 
-          echo "✅ Local image built successfully: ${{ env.IMAGE_NAME }}:local"
+          echo "Docker image built successfully"
 
-      - name: 🔑 Login to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           logout: true
 
-      - name: ⬆️ Push Docker Images to Docker Hub
+      - name: Push Docker Images
         shell: powershell
         run: |
           echo "Pushing images to Docker Hub..."
@@ -45,9 +47,9 @@ jobs:
           docker push "${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}"
           docker push "${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest"
 
-          echo "✅ Successfully pushed to Docker Hub"
+          echo "Successfully pushed to Docker Hub"
 
-      - name: 🔍 Check Kubernetes
+      - name: Check Kubernetes
         shell: powershell
         run: |
           echo "Checking Kubernetes connection..."
@@ -56,5 +58,5 @@ jobs:
           kubectl get nodes
           kubectl get pods
 
-          echo "✅ Kubernetes connection successful"
-
+          echo "Kubernetes connection successful"
+```
