@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_push: 
+  build_and_push:
     runs-on: [self-hosted, windows]
 
     env:
@@ -21,7 +21,7 @@ jobs:
       - name: Build Docker Image
         shell: powershell
         run: |
-          echo "Building local Docker image..."
+          echo "Building Docker image..."
 
           docker build `
             --file appbox/milkapp/Dockerfile `
@@ -49,17 +49,35 @@ jobs:
 
           echo "Successfully pushed to Docker Hub"
 
-      - name: Check Kubernetes
+      - name: Check Kubernetes Connection
         shell: powershell
         run: |
           echo "Checking Kubernetes connection..."
 
           kubectl config current-context
           kubectl get nodes
-          kubectl get pods
 
           echo "Kubernetes connection successful"
-          kubectl get deployment milkapp
+
+      - name: Deploy MilkApp to Kubernetes
+        shell: powershell
+        run: |
+          echo "Deploying MilkApp..."
+
+          kubectl apply -f k8s/milkapp.yaml
+
+          echo "Waiting for deployment to complete..."
+
+          kubectl rollout status deployment/milkapp-deployment
+
+          echo "MilkApp deployment successful!"
+
+          echo "Deployment:"
+          kubectl get deployment milkapp-deployment
+
+          echo "Pods:"
           kubectl get pods -l app=milkapp
+
+          echo "Service:"
           kubectl get service milkapp-service
-    
+
