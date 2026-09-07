@@ -1,4 +1,4 @@
-```yaml
+
 name: milkapp-workflow
 
 on:
@@ -59,4 +59,4 @@ jobs:
           kubectl get pods
 
           echo "Kubernetes connection successful"
-```
+
