@@ -42,6 +42,8 @@ jobs:
           docker push ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
           echo "✅ Successfully pushed to Docker Hub"
       - name: 🚀 Deploy to Kubernetes
+      - name: 🔍 Check Kubernetes
         run: |
-          kubectl apply -f k8s/
-          kubectl rollout status deployment/milkapp 
+          kubectl config current-context
+          kubectl get nodes
+          kubectl get pods
