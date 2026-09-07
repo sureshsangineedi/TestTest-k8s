@@ -41,3 +41,7 @@ jobs:
           docker push ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.DOCKER_TAG }}
           docker push ${{ env.DOCKER_HUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
           echo "✅ Successfully pushed to Docker Hub"
+      - name: 🚀 Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/
+          kubectl rollout status deployment/milkapp 
