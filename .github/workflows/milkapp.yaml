@@ -72,7 +72,7 @@ jobs:
 
           echo "MilkApp deployment successful!"
 
-          echo "Deployment:"
+          echo "Deployment:" 
           kubectl get deployment milkapp-deployment
 
           echo "Pods:"
