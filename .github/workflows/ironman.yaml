@@ -62,21 +62,5 @@ jobs:
       - name: Deploy ironman to Kubernetes
         shell: powershell
         run: |
-          echo "Deploying ironman..."
-
-          kubectl apply -f k8s\deployment.yaml
-
-          echo "Waiting for deployment to complete..."
-
-          kubectl rollout status deployment/ironman-deployment
-
-          echo "ironmanApp deployment successful!"
-
-          echo "Deployment:" 
-          kubectl get deployment ironman-deployment
-
-          echo "Pods:"
-          kubectl get pods -l app=ironman
-
-          echo "Service:"
-          kubectl get service ironman-service
+          $ErrorActionPreference = "Stop"
+           kubectl apply -f appbox/ironman/k8s/deployment.yaml
