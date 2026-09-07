@@ -59,4 +59,7 @@ jobs:
           kubectl get pods
 
           echo "Kubernetes connection successful"
-
+          kubectl get deployment milkapp
+          kubectl get pods -l app=milkapp
+          kubectl get service milkapp-service
+    
