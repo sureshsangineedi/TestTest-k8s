@@ -1,4 +1,4 @@
-FROM alpline
+FROM nginx:alpline
 
 COPY appbox/flow/index.html /usr/share/nginx/html/index.html
 
