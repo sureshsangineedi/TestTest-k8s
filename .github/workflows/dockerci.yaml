@@ -14,4 +14,4 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Build Docker image
-        run: docker build -t myapp:v1 ./appbox/dockercerl/appbox
+        run: docker build -t myapp:v1 ./appbox/dockercl/appbox
