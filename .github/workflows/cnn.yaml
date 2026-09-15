@@ -1,11 +1,11 @@
 name: cnn
 
 on:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
-  workcnn_dispatch:
+  # workcnn_dispatch:
 
 jobs:
   build_and_push:
